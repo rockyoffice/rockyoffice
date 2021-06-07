@@ -131,7 +131,7 @@ namespace PdfReader
 	static char *CopyString(char *sString)
 	{
 	    int nDataSize = (int)strlen(sString) + 1;
-		char *sResult = (char *)MemUtilsMalloc(DataSize);
+		char *sResult = (char *)MemUtilsMalloc(nDataSize);
         memcpy((void*)sResult, (void*)sString, nDataSize);
 		return sResult;
 	}
