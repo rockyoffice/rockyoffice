@@ -50,7 +50,6 @@
 #include "Page.h"
 #include "Annot.h"
 #include "Graphics.h"
-
 // Под виндой переопределяется
 #ifdef GetObject
 #undef GetObject
@@ -672,6 +671,7 @@ namespace PdfReader
 		Operator *pOperator = NULL;
 		// Ищем оператор
 		char* sName = pCommand->GetCommand();
+        //std::cout << sName << std::endl;
 		if (!(pOperator = FindOperator(sName)))
 		{
 			if (m_nIgnoreUndef == 0) // Проверяем наличие незакрытого оператора BX
