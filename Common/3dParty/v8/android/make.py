@@ -7,7 +7,7 @@ if ("linux" == base.host_platform()):
   if not base.is_dir("./build"):
     base.bash("./build")
 
-if ("mac" == base.host_platform()):
+if ("mac" == base.host_platform() or "windows" == base.host_platform()):
   if not base.is_file("./build.zip"):
     base.bash("./run_docker")
   if not base.is_dir("./build"):
