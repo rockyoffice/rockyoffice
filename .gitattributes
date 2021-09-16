@@ -1593,3 +1593,5 @@ X2tConverter/test/iosTest/TestIOSX2tConverter/smeta.xlsx svn_mime_002dtype=appli
 /XpsFile svnc_tsvn_003alogminsize=5
 XpsFile/XpsFileTest svnc_tsvn_003alogminsize=5
 XpsFile/XpsLib svnc_tsvn_003alogminsize=5
+# Never modify line endings of our bash scripts
+*.sh -crlf
