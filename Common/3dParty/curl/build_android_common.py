@@ -17,6 +17,7 @@ def set_env():
     ARCHS = ["arm", "arm64", "x86", "x86_64"]
     ABIS = ["armeabi-v7a", "arm64-v8a", "x86", "x86_64"]
     ABI_TRIPLES = ["arm-linux-androideabi", "aarch64-linux-android", "i686-linux-android", "x86_64-linux-android"]
+    return
 
 
 def check_android_env():

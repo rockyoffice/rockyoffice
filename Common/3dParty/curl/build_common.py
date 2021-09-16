@@ -84,8 +84,23 @@ def set_pkg_config_path():
     return True
 
 
-def remove_dirs(dirs, stderr=None):
+def remove_dirs(dirs, stderr=None, stdout=None):
     command = ['rd', '/s', '/q'] if 'windows' == base.host_platform() else ['rm', '-rf']
     command += dirs
-    subprocess.call(command, stderr=stderr)
-    return
+    try:
+        subprocess.call(command, stderr=stderr, stdout=stdout)
+        return True
+    except Exception as e:
+        print ('remove_dirs: exception %s' % str(e))
+        return False
+
+
+def mkdir_p(dir, stderr=None, stdout=None):
+    command = ['md'] if 'windows' == base.host_platform() else ['mkdir', '-p']
+    command.append(dir)
+    try:
+        subprocess.call(command, stderr=stderr, stdout=stdout)
+        return True
+    except Exception as e:
+        print ('remove_dirs: exception %s' % str(e))
+        return False

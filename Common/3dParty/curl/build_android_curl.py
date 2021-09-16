@@ -20,16 +20,16 @@ def configure_make(arch, abi, abi_triple, lib_name, pwd_path, tools_root):
     prefix_dir = pwd_path + base.get_path('/build/android/') + abi
     if os.path.isdir(prefix_dir):
         build_common.remove_dirs(dirs=[prefix_dir], stderr=open(os.devnull, 'w'))
-    os.system('mkdir -p ' + prefix_dir)
+    build_common.mkdir_p(prefix_dir)
 
     output_root = tools_root + base.get_path('/build/android/') + abi
-    os.system('mkdir -p ' + output_root + base.get_path('/log'))
+    build_common.mkdir_p(output_root + base.get_path('/log'))
 
     build_android_common.set_android_toolchain(name='curl', common_arch=arch, api=str(os.getenv('ANDROID_API', '')))
     build_android_common.set_android_cpu_feature(name='curl', common_arch=arch, api=str(os.getenv('ANDROID_API', '')))
 
     os.environ['ANDROID_NDK_HOME'] = os.getenv('ANDROID_NDK_ROOT')
-    print ('ANDROID_NDK_HOME=%s' % os.environ[ANDROID_NDK_HOME])
+    print ('ANDROID_NDK_HOME=%s' % os.environ['ANDROID_NDK_HOME'])
 
     openssl_out_dir = pwd_path + base.get_path('/../openssl/build/android/') + abi
 
@@ -86,10 +86,15 @@ def get_lib_name(v1, v2, v3, separator):
     return 'curl-' + str(v1) + separator + str(v2) + separator + str(v3)
 
 
-def make(target_archs):
+def make(target_archs=None):
+    if not build_android_common.check_android_env():
+        print 'no android env'
+        return False
+    if not build_common.set_pkg_config_path():
+        print 'unable to set PKG_CONFIG_PATH'
+        return False
+    build_android_common.set_env()
 
-
-    # todo init
     tools_root = base.get_path(os.getcwd())
     pwd_path = base.get_path(base.get_script_dir(__file__))
     os.chdir(pwd_path)
@@ -119,10 +124,11 @@ def make(target_archs):
     build_common.log_info('%s %s start...' % (os.environ['PLATFORM_TYPE'], lib_name))
 
     for i in range(0, len(build_android_common.ARCHS)):
-        if target_archs and build_android_common.ARCHS[i] in target_archs:
+        # if target_archs and build_android_common.ARCHS[i] in target_archs:
+        if True:
             configure_make(
                 build_android_common.ARCHS[i]
-                , build_android_common.ABI[i]
+                , build_android_common.ABIS[i]
                 , build_android_common.ABI_TRIPLES[i]
                 , lib_name=lib_name
                 , pwd_path=pwd_path
@@ -130,4 +136,7 @@ def make(target_archs):
             )
 
     build_common.log_info('%s %s end...' % (os.environ['PLATFORM_TYPE'], lib_name))
-    return
+    return True
+
+
+make()
