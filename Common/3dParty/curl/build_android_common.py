@@ -131,11 +131,11 @@ def set_android_toolchain_bin():
     old_path = os.getenv('PATH')
     android_ndk_root = os.getenv('ANDROID_NDK_ROOT')
     if not android_ndk_root:
-        return
+        return False
     separator = ';' if 'windows' == base.host_platform() else ':'
     toolchain = get_toolchain()
     if not toolchain:
-        return
+        return False
     # PATH=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/$(get_toolchain)/bin:$PATH
     new_path = ''
     new_path += android_ndk_root
@@ -145,7 +145,7 @@ def set_android_toolchain_bin():
     new_path += separator
     new_path += old_path
     os.environ['PATH'] = new_path
-    return
+    return True
 
 
 def set_android_toolchain(name, common_arch, api):
@@ -252,7 +252,6 @@ def android_printf_global_params(arch, abi, abi_triple, in_dir, out_dir):
     print ('PLATFORM_TYPE = ' + os.environ['PLATFORM_TYPE'])
     print ('ANDROID_API =   ' + os.environ['ANDROID_API'])
     print ('in_dir =        ' + in_dir)
-    print ('out_dir =       ' + out_dir)
     print ('out_dir =       ' + out_dir)
     print ('AR =            ' + os.environ['AR'])
     print ('CC =            ' + os.environ['CC'])
