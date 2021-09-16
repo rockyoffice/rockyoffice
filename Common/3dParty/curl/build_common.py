@@ -82,3 +82,10 @@ def set_pkg_config_path():
         return False
     os.environ['PKG_CONFIG_PATH'] = result
     return True
+
+
+def remove_dirs(dirs, stderr=None):
+    command = ['rd', '/s', '/q'] if 'windows' == base.host_platform() else ['rm', '-rf']
+    command += dirs
+    subprocess.call(command, stderr=stderr)
+    return

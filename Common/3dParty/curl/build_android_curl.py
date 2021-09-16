@@ -12,14 +12,14 @@ import base  # get_path, get_script_dir, host_platform
 def configure_make(arch, abi, abi_triple, lib_name, pwd_path, tools_root):
     build_common.log_info('configure %s start...' % abi)
     if os.path.isdir(base.get_path('./') + lib_name):
-        subprocess.call(['rm', '-rf', lib_name])
+        build_common.remove_dirs(dirs=[lib_name], stderr=open(os.devnull, 'w'))
     subprocess.call(['tar', 'xfz', lib_name + '.tar.gz'])
     os.system('pushd .')
     os.system('cd ' + lib_name)
 
     prefix_dir = pwd_path + base.get_path('/build/android/') + abi
     if os.path.isdir(prefix_dir):
-        subprocess.call(['rm', '-rf', prefix_dir])
+        build_common.remove_dirs(dirs=[prefix_dir], stderr=open(os.devnull, 'w'))
     os.system('mkdir -p ' + prefix_dir)
 
     output_root = tools_root + base.get_path('/build/android/') + abi
@@ -47,6 +47,8 @@ def configure_make(arch, abi, abi_triple, lib_name, pwd_path, tools_root):
         build_common.log_error('build_host is None')
         return False
 
+    log_file = output_root + base.get_path('/log/') + abi + '.log'
+
     command = ''
     command += './configure --host='
     command += build_host
@@ -55,23 +57,36 @@ def configure_make(arch, abi, abi_triple, lib_name, pwd_path, tools_root):
     command += ' --enable-ipv6 --with-ssl='
     command += openssl_out_dir
     command += ' --enable-static --disable-shared >'
-    command += output_root
-    command += base.get_path('/log/')
-    command += abi
-    command += '.log 2>&1'
+    command += log_file
+    command += ' 2>&1'
     os.system(command)
 
     build_common.log_info('make %s start...' % abi)
 
-    # todo make
-    return
+    command = ''
+    command += 'make clean >>'
+    command += log_file
+    os.system(command)
+
+    command = ''
+    command += 'make -j '
+    command += str(build_common.get_cpu_count())
+    command += ' >>'
+    command += log_file
+    command += ' 2>&1'
+    if os.system(command) == 0:
+        command = 'make install >>' + log_file + ' 2>&1'
+        os.system(command)
+
+    os.system('popd')
+    return True
 
 
 def get_lib_name(v1, v2, v3, separator):
     return 'curl-' + str(v1) + separator + str(v2) + separator + str(v3)
 
 
-def make():
+def make(target_archs):
 
 
     # todo init
@@ -94,12 +109,25 @@ def make():
     # 'https://curl.haxx.se/download/' + lib_name + '.tar.gz'
     # https://github.com/curl/curl/releases/download/curl-7_69_0/curl-7.69.0.tar.gz
     # https://github.com/curl/curl/releases/download/curl-7_68_0/curl-7.68.0.tar.gz
-    command = ['rd', '/s', '/q'] if 'windows' == base.host_platform() else ['rm', '-rf']
-    command.append(lib_dest_dir)
-    # command.append(lib_name)  # removed in configure_make
-    subprocess.call(command, stderr=open(os.devnull, 'w'))
+    build_common.remove_dirs(dirs=[lib_dest_dir, lib_name], stderr=open(os.devnull, 'w'))
     if not os.path.isfile(base.get_path('./') + lib_name + '.tar.gz'):
         # todo check what for >lib_name.tar.gz in original script
         os.system('curl -LO ' + download_url)
+
     build_android_common.set_android_toolchain_bin()
-    # todo
+
+    build_common.log_info('%s %s start...' % (os.environ['PLATFORM_TYPE'], lib_name))
+
+    for i in range(0, len(build_android_common.ARCHS)):
+        if target_archs and build_android_common.ARCHS[i] in target_archs:
+            configure_make(
+                build_android_common.ARCHS[i]
+                , build_android_common.ABI[i]
+                , build_android_common.ABI_TRIPLES[i]
+                , lib_name=lib_name
+                , pwd_path=pwd_path
+                , tools_root=tools_root
+            )
+
+    build_common.log_info('%s %s end...' % (os.environ['PLATFORM_TYPE'], lib_name))
+    return
