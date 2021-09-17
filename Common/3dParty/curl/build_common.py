@@ -100,16 +100,6 @@ def mkdir_p(dir, stderr=None, stdout=None):
     command += dir
     os.system(command)
     return
-    command = ['mkdir']
-    if 'windows' != base.host_platform():
-        command.append('-p')
-    command.append(dir)
-    try:
-        subprocess.call(command, stderr=stderr, stdout=stdout)
-        return True
-    except Exception as e:
-        print ('mkdir -p: exception %s' % str(e))
-        return False
 
 
 def silently_remove_dir_if_exist(dir):

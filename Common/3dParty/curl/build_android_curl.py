@@ -15,7 +15,10 @@ def configure_make(arch, abi, abi_triple, lib_name, pwd_path, tools_root):
         build_common.remove_dirs(dirs=[lib_name], stderr=open(os.devnull, 'w'))
     subprocess.call(['tar', 'xfz', lib_name + '.tar.gz'])
     os.system('pushd .')
-    os.system('cd ' + lib_name)
+    os.chdir(lib_name)
+    # os.system('cd ' + lib_name)
+    # subprocess.call(['cd', lib_name])
+    print 'pwd: ' + os.getcwd()
 
     prefix_dir = pwd_path + base.get_path('/build/android/') + abi
     build_common.silently_remove_dir_if_exist(dir=prefix_dir)
@@ -28,6 +31,7 @@ def configure_make(arch, abi, abi_triple, lib_name, pwd_path, tools_root):
     # build_common.silently_remove_dirs_if_any(dirs=[full_output_root])
     print 'output_root = ' + output_root
     build_common.mkdir_p(full_output_root)
+    print 'pwd: ' + os.getcwd()
 
     build_android_common.set_android_toolchain(name='curl', common_arch=arch, api=str(os.getenv('ANDROID_API', '')))
     build_android_common.set_android_cpu_feature(name='curl', common_arch=arch, api=str(os.getenv('ANDROID_API', '')))
@@ -69,29 +73,32 @@ def configure_make(arch, abi, abi_triple, lib_name, pwd_path, tools_root):
 
     build_common.log_info('make %s start...' % abi)
 
-    command = ''
-    command += 'make clean >>'
-    command += log_file
-    print ('todo:')
-    print command
-    os.system(command)
+    # command = ''
+    # command += 'make clean >'
+    # command += log_file
+    # print ('todo:')
+    # print command
+    # os.system(command)
 
     cpu_count = str(build_common.get_cpu_count())
     command = ''
     command += 'make -j '
     command += cpu_count
-    command += ' >>'
+    command += ' >'
     command += log_file
     command += ' 2>&1'
-    print ('todo:')
+    print 'pwd: ' + os.getcwd()
+    print 'todo:'
     print command
-    if os.system(command) == 0:
-        command = 'make install >>' + log_file + ' 2>&1'
+    make_result = os.system(command)
+    print 'done make'
+    if make_result == 0:
+        command = 'make install >' + log_file + ' 2>&1'
         print ('todo:')
         print command
         os.system(command)
     else:
-        print 'make -j failed with ' + cpu_count
+        print 'make -j ' + cpu_count + ' failed with code ' + str(make_result)
 
     os.system('popd')
     build_common.log_info('make %s end...' % abi)
@@ -141,7 +148,8 @@ def make(target_archs=None):
 
     for i in range(0, len(build_android_common.ARCHS)):
         # if target_archs and build_android_common.ARCHS[i] in target_archs:
-        if True:
+        # if True:
+        if 'arm' == build_android_common.ARCHS[i]:  # arm only
             configure_make(
                 build_android_common.ARCHS[i]
                 , build_android_common.ABIS[i]
