@@ -96,11 +96,23 @@ def remove_dirs(dirs, stderr=None, stdout=None):
 
 
 def mkdir_p(dir, stderr=None, stdout=None):
-    command = ['md'] if 'windows' == base.host_platform() else ['mkdir', '-p']
+    command = 'md ' if 'windows' == base.host_platform() else 'mkdir -p '
+    command += dir
+    os.system(command)
+    return
+    command = ['mkdir']
+    if 'windows' != base.host_platform():
+        command.append('-p')
     command.append(dir)
     try:
         subprocess.call(command, stderr=stderr, stdout=stdout)
         return True
     except Exception as e:
-        print ('remove_dirs: exception %s' % str(e))
+        print ('mkdir -p: exception %s' % str(e))
         return False
+
+
+def silently_remove_dir_if_exist(dir):
+    if os.path.isdir(dir):
+        remove_dirs(dirs=[dir], stderr=open(os.devnull, 'w'), stdout=open(os.devnull, 'w'))
+    return

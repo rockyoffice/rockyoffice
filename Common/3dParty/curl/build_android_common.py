@@ -2,10 +2,10 @@
 
 import os  # getenv
 import platform  # machine
+import build_common  # get_command_output
 import sys  # path.append
 sys.path.append('./../../../../build_tools/scripts')
 import base  # host_platform
-import build_common  # get_command_output
 
 
 def set_env():

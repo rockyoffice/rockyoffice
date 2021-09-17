@@ -18,12 +18,16 @@ def configure_make(arch, abi, abi_triple, lib_name, pwd_path, tools_root):
     os.system('cd ' + lib_name)
 
     prefix_dir = pwd_path + base.get_path('/build/android/') + abi
-    if os.path.isdir(prefix_dir):
-        build_common.remove_dirs(dirs=[prefix_dir], stderr=open(os.devnull, 'w'))
+    build_common.silently_remove_dir_if_exist(dir=prefix_dir)
+    print 'prefix_dir = ' + prefix_dir
     build_common.mkdir_p(prefix_dir)
 
     output_root = tools_root + base.get_path('/build/android/') + abi
-    build_common.mkdir_p(output_root + base.get_path('/log'))
+    full_output_root = output_root + base.get_path('/log')
+    # no need
+    # build_common.silently_remove_dirs_if_any(dirs=[full_output_root])
+    print 'output_root = ' + output_root
+    build_common.mkdir_p(full_output_root)
 
     build_android_common.set_android_toolchain(name='curl', common_arch=arch, api=str(os.getenv('ANDROID_API', '')))
     build_android_common.set_android_cpu_feature(name='curl', common_arch=arch, api=str(os.getenv('ANDROID_API', '')))
@@ -59,6 +63,8 @@ def configure_make(arch, abi, abi_triple, lib_name, pwd_path, tools_root):
     command += ' --enable-static --disable-shared >'
     command += log_file
     command += ' 2>&1'
+    print ('todo:')
+    print command
     os.system(command)
 
     build_common.log_info('make %s start...' % abi)
@@ -66,19 +72,29 @@ def configure_make(arch, abi, abi_triple, lib_name, pwd_path, tools_root):
     command = ''
     command += 'make clean >>'
     command += log_file
+    print ('todo:')
+    print command
     os.system(command)
 
+    cpu_count = str(build_common.get_cpu_count())
     command = ''
     command += 'make -j '
-    command += str(build_common.get_cpu_count())
+    command += cpu_count
     command += ' >>'
     command += log_file
     command += ' 2>&1'
+    print ('todo:')
+    print command
     if os.system(command) == 0:
         command = 'make install >>' + log_file + ' 2>&1'
+        print ('todo:')
+        print command
         os.system(command)
+    else:
+        print 'make -j failed with ' + cpu_count
 
     os.system('popd')
+    build_common.log_info('make %s end...' % abi)
     return True
 
 
