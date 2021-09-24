@@ -2,16 +2,12 @@
 #include <QFileDialog>
 #include <QTextDocument>
 
-QRenderer::QRenderer(const QString &fileName)
+QRenderer::QRenderer()
 {
     m_oPrinter = new QPrinter(QPrinter::PrinterResolution);
     m_oPainter = new QPainter();
     m_oPrinter->setOutputFormat(QPrinter::PdfFormat);
     m_oPrinter->setPaperSize(QPrinter::A4);
-    m_oPrinter->setOutputFileName(fileName);
-
-    m_oPainter->begin(m_oPrinter);
-
 }
 
 QRenderer::~QRenderer()
@@ -22,12 +18,17 @@ QRenderer::~QRenderer()
     delete m_oPrinter;
 }
 
+
+
 HRESULT QRenderer::get_Type(LONG *lType)
 {/*TODO*/ return S_OK; }
 
 //-------- Функции для работы со страницей --------------------------------------------------
 HRESULT QRenderer::NewPage()
-{/*TODO*/ return S_OK; }
+{
+    m_oPrinter->newPage();
+    return S_OK;
+}
 
 HRESULT QRenderer::get_Height(double *dHeight)
 {/*TODO*/ return S_OK; }

@@ -18,59 +18,36 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>80</y>
+      <y>130</y>
       <width>441</width>
-      <height>421</height>
+      <height>371</height>
      </rect>
     </property>
    </widget>
    <widget class="QPushButton" name="PrintButton">
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>260</x>
       <y>510</y>
-      <width>75</width>
-      <height>23</height>
+      <width>101</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
      <string>Print</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="FontFileText">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>30</y>
-      <width>281</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QPushButton" name="LoadFontFileButton">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>20</y>
-      <width>91</width>
-      <height>31</height>
+      <x>10</x>
+      <y>50</y>
+      <width>121</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
      <string>Select Font File</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="LoadFontButton">
-    <property name="geometry">
-     <rect>
-      <x>380</x>
-      <y>20</y>
-      <width>71</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Load Font</string>
     </property>
    </widget>
    <widget class="QLabel" name="FontText">
@@ -91,12 +68,142 @@
      <rect>
       <x>90</x>
       <y>10</y>
-      <width>71</width>
+      <width>361</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
      <string>Arial</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="FontNoteLabel">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>50</y>
+      <width>151</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Works only if renderer active</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="FontSizeLine">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>80</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>12</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="FontFamilyLine">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>80</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="FontStyleLine">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>80</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="FontSizeLabel">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>80</y>
+      <width>47</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Size</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="FontFamilyLabel">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>80</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Family Number</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="FontStyleLabel">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>80</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Style Number</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="SelectOutputFileButton">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>510</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Select File</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>50</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Renderer State</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="ActiveLabel">
+    <property name="geometry">
+     <rect>
+      <x>380</x>
+      <y>50</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>NotActive</string>
     </property>
    </widget>
   </widget>

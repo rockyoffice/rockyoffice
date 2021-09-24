@@ -1,6 +1,10 @@
+
 #include "../../../DesktopEditor/graphics/pro/Graphics.h"
 #include <QPrinter>
 #include <QPainter>
+#include <QFileDialog>
+#include <QFont>
+#include <QFontDatabase>
 
 #ifndef QRENDERER_H
 #define QRENDERER_H
@@ -11,9 +15,20 @@ class QRenderer
 private:
     QPrinter *m_oPrinter;
     QPainter *m_oPainter;
+    QFontDatabase fonts;
 public:
 
-    QRenderer(const QString &filename);
+    QRenderer();
+
+    QString getFontName() {
+        return m_oPainter->font().family();
+    }
+
+    HRESULT beginRender()
+    {
+        m_oPainter->begin(m_oPrinter);
+        return S_OK;
+    }
 
     HRESULT endRender() {
         if(m_oPainter && m_oPainter->isActive())
@@ -22,6 +37,30 @@ public:
             return S_OK;
         }
         return S_FALSE;
+    }
+
+    HRESULT selectOutputFile(const QString &fileName)
+    {
+        m_oPrinter->setOutputFileName(fileName);
+        return S_OK;
+    }
+
+    HRESULT loadFontFile(const QString &filename, int family, int style, int size) {
+        int fontId = fonts.addApplicationFont(filename);
+        if (fontId == -1) {
+            return S_FALSE;
+        }
+        QStringList family_list = fonts.applicationFontFamilies(fontId);
+        QStringList styles_list = fonts.styles(family_list[family]);
+        QFont loaded_font = fonts.font(family_list[family], styles_list[style], size);
+        m_oPainter->setFont(loaded_font);
+        int a = loaded_font.pointSize();
+        std::cout << a;
+        return S_OK;
+    }
+
+    bool isActive() {
+        return m_oPainter->isActive();
     }
 
     virtual ~QRenderer();
