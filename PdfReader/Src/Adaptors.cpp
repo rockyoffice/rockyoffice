@@ -4,6 +4,7 @@
 
 #include "Adaptors.h"
 
+// копии методов из старой либы
 void GlobalParamsAdaptor::SetFontManager(NSFonts::IFontManager *pFontManager)
 {
     m_pFontManager = pFontManager;

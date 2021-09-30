@@ -2626,6 +2626,10 @@ namespace PdfReader
         m_bTiling = false;
     }
 
+    /*
+     *  В новой версии xpdf решение о том какой градиент рендерить,
+     * принимает outputDev, тут происходит выбор функции рендера и подготовка границы отрисовки.
+     * */
     GBool RendererOutputDev::shadedFill(GfxState *pGState, GfxShading *pShading)
     {
         double x0, y0, x1, x2, y1, y2, r1, r2;
@@ -2738,6 +2742,9 @@ namespace PdfReader
         return false;
     }
 
+    /*
+     * Рендер функционального шейдинга
+     * */
 	bool RendererOutputDev::FunctionShadedFill(GfxState *pGState, GfxFunctionShading *pShading)
 	{
 		if (m_bDrawOnlyText)
@@ -2766,6 +2773,7 @@ namespace PdfReader
 
         GfxColorSpace *ColorSpace = pShading->getColorSpace();
 
+        // Копируем цветовую функцию в массив.
 		for (size_t i = 0; i < info.shading.function.get_resolution(); i++)
         {
 		    cur_x = 0;
@@ -2795,6 +2803,8 @@ namespace PdfReader
 		pGState->clearPath();
 		return true;
 	}
+
+	// Рендер линейного шейдинга.
 	bool RendererOutputDev::AxialShadedFill(GfxState *pGState, GfxAxialShading *pShading)
 	{
 		if (m_bDrawOnlyText)
@@ -2859,6 +2869,8 @@ namespace PdfReader
 		pGState->clearPath();
 		return true;
 	}
+
+	// Рендер радиального шейдинга
 	bool RendererOutputDev::RadialShadedFill(GfxState *pGState, GfxRadialShading *pShading)
 	{
 		if (m_bDrawOnlyText)
@@ -2917,6 +2929,8 @@ namespace PdfReader
 		pGState->clearPath();
 		return true;
 	}
+
+	// Рендер треугольного шейдинга
 	bool RendererOutputDev::GouraundTriangleFill(GfxState *pGState, const std::vector<GfxColor*> &colors, const std::vector<NSStructures::Point> &points)
 	{
 		if (m_bDrawOnlyText)
@@ -2962,6 +2976,8 @@ namespace PdfReader
 		m_pRenderer->put_BrushType(brush);
 		return true;
 	}
+
+	// Рендер patch шейдинга
 	bool RendererOutputDev::PatchMeshFill(GfxState *pGState, GfxPatch *patch, GfxPatchMeshShading *pShading)
 	{
 		if (m_bDrawOnlyText)
@@ -3095,6 +3111,8 @@ namespace PdfReader
 
         m_pRenderer->EndCommand(c_nPDFTilingFill);
     }
+
+    // Поддержка стека clip.
     void RendererOutputDev::clip(GfxState *pGState)
     {
         if (m_bDrawOnlyText)
@@ -3108,6 +3126,8 @@ namespace PdfReader
         m_bClipChanged = true;
         updateClip(pGState);
     }
+
+    // Поддержка стека clip
     void RendererOutputDev::eoClip(GfxState *pGState)
     {
         if (m_bDrawOnlyText)
@@ -3121,6 +3141,8 @@ namespace PdfReader
         m_bClipChanged = true;
         updateClip(pGState);
     }
+
+    // Поддержка стека clip
     void RendererOutputDev::clipToStrokePath(GfxState *pGState)
     {
         if (m_bDrawOnlyText)
@@ -3134,6 +3156,8 @@ namespace PdfReader
         m_bClipChanged = true;
         updateClip(pGState);
     }
+
+    // Добавление пути в clip m_pRenderer
     void RendererOutputDev::clipToPath(GfxState *pGState, GfxPath *pPath, double *pMatrix, bool bEO)
     {
         if (m_bDrawOnlyText)
@@ -3151,6 +3175,8 @@ namespace PdfReader
         m_pRenderer->EndCommand(c_nPathType);
         m_pRenderer->EndCommand(c_nClipType);
     }
+
+    // Добавление текста как пути в clip m_pRenderer
     void RendererOutputDev::ClipToText(const std::wstring& wsFontName, const std::wstring& wsFontPath, double dFontSize, int nFontStyle, double *pMatrix, const std::wstring& wsText, double dX, double dY, double dWidth, double dHeight, double dBaseLineOffset)
     {
         if (m_bDrawOnlyText)
@@ -3297,6 +3323,8 @@ namespace PdfReader
         m_pRenderer->CommandDrawTextEx(wsUnicodeText, pGids, unGidsCount, PDFCoordsToMM(100), PDFCoordsToMM(100), 0, PDFCoordsToMM(0));
         RELEASEARRAYOBJECTS(pGids);
     }
+
+    // Отрисовка текста в pdf проходит, через эту функцию
     void RendererOutputDev::drawChar(GfxState *pGState, double dX, double dY, double dDx, double dDy, double dOriginX, double dOriginY, CharCode nCode, int nBytesCount, Unicode *pUnicode, int nUnicodeLen)
     {
         if (m_bTransparentGroupSoftMask)
@@ -3973,6 +4001,7 @@ namespace PdfReader
         // Undo preblend
         if (pMatteColor)
         {
+            // По какой-то причине в pColorMap нет готовой функции для преобразования double* в цвет, поэтому сделано в ручную
             GfxRGB oMatteRGB;
             GfxColor oColor;
             for (int i = 0; i < pColorMap->getNumPixelComps(); ++i) {
@@ -4119,10 +4148,13 @@ namespace PdfReader
 
         updateClipAttack(pGState);
     }
+
+    /*
+     *  Поддержка стека клипов. На данный момент при каждом обновлении стека, все пути добавляются в mp_Renderer заново.
+     *  Возможно эту проблему можно будет решить реализовав стек клипов внутри m_pRenderer
+     * */
     void RendererOutputDev::updateClipAttack(GfxState *pGState)
     {
-
-        //return;
         if (!m_bClipChanged) return;
         m_pRenderer->BeginCommand(c_nResetClipType);
         m_pRenderer->EndCommand(c_nResetClipType);

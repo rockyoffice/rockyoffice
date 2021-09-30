@@ -2035,7 +2035,9 @@ namespace Aggplus
 	}
 
 
-    // Testing
+    /*
+     * Рендер новых градиентов.
+     * */
     void CGraphics::DoFillPathGradientType(CBrushLinearGradient *pBrush)
 	{
 		CDoubleRect& oBounds = pBrush->GetBounds();
