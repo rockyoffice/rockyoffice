@@ -107,18 +107,19 @@ const long c_nParamFlipY		= 0x0002;
 const long c_nFlipNextRotate	= 0x0004;
 
 // типы рендерера
-const long c_nUnknownRenderer   = 0x0000;
-const long c_nPDFWriter         = 0x0001;
-const long c_nHtmlRendrerer		= 0x0002;
-const long c_nSVGRendrerer		= 0x0003;
-const long c_nSWFRenderer       = 0x0004;
-const long c_nSVGConverter      = 0x0005;
-const long c_nHtmlRendrerer2	= 0x0006;
-const long c_nEbookWriter		= 0x0007;
-const long c_nDocxWriter		= 0x0008;
-const long c_nVifFormat			= 0x0009;
-const long c_nGrRenderer		= 0x0010;
+const long c_nUnknownRenderer           = 0x0000;
+const long c_nPDFWriter                 = 0x0001;
+const long c_nHtmlRendrerer             = 0x0002;
+const long c_nSVGRendrerer              = 0x0003;
+const long c_nSWFRenderer               = 0x0004;
+const long c_nSVGConverter              = 0x0005;
+const long c_nHtmlRendrerer2            = 0x0006;
+const long c_nEbookWriter               = 0x0007;
+const long c_nDocxWriter                = 0x0008;
+const long c_nVifFormat                 = 0x0009;
+const long c_nGrRenderer                = 0x0010;
 const long c_nHtmlRendrerer3            = 0x0011;
+const long c_nQtDocxRenderer            = 0x0012;
 
 class CFormFieldInfo;
 
