@@ -119,7 +119,7 @@ const long c_nDocxWriter                = 0x0008;
 const long c_nVifFormat                 = 0x0009;
 const long c_nGrRenderer                = 0x0010;
 const long c_nHtmlRendrerer3            = 0x0011;
-const long c_nQtDocxRenderer            = 0x0012;
+const long c_nQDocxRenderer            = 0x0012;
 
 class CFormFieldInfo;
 
