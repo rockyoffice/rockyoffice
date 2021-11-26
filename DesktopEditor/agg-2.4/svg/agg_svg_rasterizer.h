@@ -1,9 +1,9 @@
 ﻿#ifndef AGG_SVG_RASTERIZER_INCLUDED
 #define AGG_SVG_RASTERIZER_INCLUDED
 
-#include "agg_rasterizer_scanline_aa.h"
-#include "agg_scanline_u.h"
-#include "agg_span_allocator.h"
+#include "./../include/agg_rasterizer_scanline_aa.h"
+#include "./../include/agg_scanline_u.h"
+#include "./../include/agg_span_allocator.h"
 #include "agg_svg_attributes.h" // for g_fill_rule_lut
 
 namespace agg

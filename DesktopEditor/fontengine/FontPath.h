@@ -36,8 +36,8 @@
 #include <memory>
 #include <string.h>
 #include <stdlib.h>
-#include "ftbitmap.h"
-#include "ftimage.h"
+#include "freetype/ftbitmap.h"
+#include "freetype/ftimage.h"
 
 #include "../graphics/pro/Fonts.h"
 

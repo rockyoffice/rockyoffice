@@ -33,7 +33,7 @@
 #define _BUILD_FONT_ENGINE_FONTFILE_H_
 
 // freetype
-#include <ft2build.h>
+#include "ft2build.h"
 #include FT_OUTLINE_H
 #include FT_SIZES_H
 #include FT_GLYPH_H

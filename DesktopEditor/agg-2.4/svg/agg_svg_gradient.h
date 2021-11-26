@@ -2,8 +2,8 @@
 #ifndef AGG_SVG_GRADIENT_INCLUDED
 #define AGG_SVG_GRADIENT_INCLUDED
 //-----------------------------------------------------------------------------
-#include "agg_array.h"
-#include "agg_trans_affine.h"
+#include "./../include/agg_array.h"
+#include "./../include/agg_trans_affine.h"
 #include "agg_svg_basics.h"
 //-----------------------------------------------------------------------------
 namespace agg

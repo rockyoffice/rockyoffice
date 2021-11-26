@@ -20,8 +20,8 @@
 #ifndef AGG_CTRL_INCLUDED
 #define AGG_CTRL_INCLUDED
 
-#include "agg_trans_affine.h"
-#include "agg_renderer_scanline.h"
+#include "./../agg_trans_affine.h"
+#include "./../agg_renderer_scanline.h"
 
 namespace agg
 {

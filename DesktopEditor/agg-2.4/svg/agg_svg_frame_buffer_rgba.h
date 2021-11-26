@@ -1,10 +1,10 @@
 ﻿#ifndef AGG_SVG_FRAME_BUFFER_RGBA_INCLUDED
 #define AGG_SVG_FRAME_BUFFER_RGBA_INCLUDED
 
-#include "agg_rendering_buffer.h"
-#include "agg_pixfmt_rgba.h"
-#include "agg_renderer_base.h"
-#include "agg_renderer_scanline.h"
+#include "./../include/agg_rendering_buffer.h"
+#include "./../include/agg_pixfmt_rgba.h"
+#include "./../include/agg_renderer_base.h"
+#include "./../include/agg_renderer_scanline.h"
 
 namespace agg
 {

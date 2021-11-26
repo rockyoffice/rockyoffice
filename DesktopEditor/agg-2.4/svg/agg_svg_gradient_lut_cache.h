@@ -2,7 +2,7 @@
 #ifndef AGG_SVG_GRADIENT_LUT_CACHE_INCLUDED
 #define AGG_SVG_GRADIENT_LUT_CACHE_INCLUDED
 //-----------------------------------------------------------------------------
-#include "agg_array.h"
+#include "./../include/agg_array.h"
 #include "agg_svg_basics.h"
 #include "agg_svg_gradient.h"
 //-----------------------------------------------------------------------------

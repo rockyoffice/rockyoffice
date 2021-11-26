@@ -56,10 +56,10 @@
 #define AGG_PLATFORM_SUPPORT_INCLUDED
 
 
-#include "agg_basics.h"
-#include "agg_rendering_buffer.h"
-#include "agg_trans_viewport.h"
-#include "ctrl/agg_ctrl.h"
+#include "./../agg_basics.h"
+#include "./../agg_rendering_buffer.h"
+#include "./../agg_trans_viewport.h"
+#include "./../ctrl/agg_ctrl.h"
 
 namespace agg
 {

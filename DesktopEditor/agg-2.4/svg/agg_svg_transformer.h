@@ -1,8 +1,8 @@
 ﻿#ifndef AGG_SVG_TRANSFORMER_INCLUDED
 #define AGG_SVG_TRANSFORMER_INCLUDED
 
-#include "agg_trans_affine.h"
-#include "agg_trans_viewport.h"
+#include "./../include/agg_trans_affine.h"
+#include "./../include/agg_trans_viewport.h"
 
 #include "agg_svg_basics.h"
 #include "agg_svg_defines.h"

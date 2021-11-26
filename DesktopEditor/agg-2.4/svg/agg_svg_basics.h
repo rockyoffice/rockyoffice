@@ -5,9 +5,9 @@
 #include <string.h>
 #include <stdarg.h>
 #include <string>
-#include "agg_array.h"
-#include "agg_pixfmt_rgba.h"
-#include "platform/agg_platform_support.h"
+#include "./../include/agg_array.h"
+#include "./../include/agg_pixfmt_rgba.h"
+#include "./../include/platform/agg_platform_support.h"
 #include "agg_svg_defines.h"
 
 namespace agg

@@ -1,8 +1,8 @@
 ﻿#ifndef AGG_SVG_ATTRIBUTES_INCLUDED
 #define AGG_SVG_ATTRIBUTES_INCLUDED
 
-#include "agg_conv_stroke.h"
-#include "agg_gamma_lut.h"
+#include "./../include/agg_conv_stroke.h"
+#include "./../include/agg_gamma_lut.h"
 #include "agg_svg_basics.h"
 #include "agg_svg_defines.h"
 #include "agg_svg_transformer.h"
