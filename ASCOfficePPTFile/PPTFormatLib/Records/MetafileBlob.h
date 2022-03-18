@@ -60,8 +60,12 @@ public:
         m_nMM = StreamUtils::ReadSHORT(pStream);
         m_nExtX = StreamUtils::ReadSHORT(pStream);
         m_nExtY = StreamUtils::ReadSHORT(pStream);
-        pStream->read(m_pData, m_oHeader.RecLen - 6);
-        std::cout << m_pData << "\n\n";
+        
+		pStream->read(m_pData, m_oHeader.RecLen - 6);
+		if (m_pData)
+		{
+			//std::cout << m_pData << "\n\n";
+		}
 	}
 
 };

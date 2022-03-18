@@ -805,6 +805,9 @@
     <ClInclude Include="..\Records\SlideTime10Atom.h">
       <Filter>Records</Filter>
     </ClInclude>
+    <ClInclude Include="..\PPTXWriter\BulletsConverter.h">
+      <Filter>OOXWriter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Reader\PPTDocumentInfoOneUser.cpp">
@@ -858,6 +861,9 @@
     </ClCompile>
     <ClCompile Include="..\Records\BlipEntityAtom.cpp">
       <Filter>Records</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PPTXWriter\BulletsConverter.cpp">
+      <Filter>OOXWriter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
