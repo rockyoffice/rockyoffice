@@ -106,6 +106,141 @@ namespace NSDocxRenderer
         oText = oText.substr(nStart, nEnd - nStart + 1);
     }
 
+    class CContTextStyle
+    {
+    public:
+        std::wstring m_sFontName;
+        bool m_bBold;
+        bool m_bItalic;
+        int m_nFontSize;
+        LONG m_nColor;
+
+    public:
+        CContTextStyle()
+        {
+            m_sFontName = L"";
+            m_bBold = false;
+            m_bItalic = false;
+            m_nFontSize = 16;
+            m_nColor = 0;
+        }
+        CContTextStyle(const CContTextStyle& oSrc)
+        {
+            m_sFontName = oSrc.m_sFontName;
+            m_bBold = oSrc.m_bBold;
+            m_bItalic = oSrc.m_bItalic;
+            m_nFontSize = oSrc.m_nFontSize;
+            m_nColor = oSrc.m_nColor;
+        }
+        CContTextStyle& operator=(const CContTextStyle& oSrc)
+        {
+            m_sFontName = oSrc.m_sFontName;
+            m_bBold = oSrc.m_bBold;
+            m_bItalic = oSrc.m_bItalic;
+            m_nFontSize = oSrc.m_nFontSize;
+            m_nColor = oSrc.m_nColor;
+            return *this;
+        }
+
+        void Write(NSStringUtils::CStringBuilder& oWriter, CContTextStyle* pDefault, int* pSpace = NULL)
+        {
+            if (!pDefault)
+            {
+                oWriter.WriteString(L"<w:rPr>");
+
+                oWriter.WriteString(L"<w:rFonts w:ascii=\"");
+                oWriter.WriteEncodeXmlString(m_sFontName);
+                oWriter.WriteString(L"\" w:hAnsi=\"");
+                oWriter.WriteEncodeXmlString(m_sFontName);
+                oWriter.WriteString(L"\" w:cs=\"");
+                oWriter.WriteEncodeXmlString(m_sFontName);
+                oWriter.WriteString(L"\"/>");
+
+                if (m_bBold)
+                    oWriter.WriteString(L"<w:b w:val=\"true\"/>");
+
+                if (m_bItalic)
+                    oWriter.WriteString(L"<w:i w:val=\"true\"/>");
+
+                oWriter.WriteString(L"<w:sz w:val=\"");
+                oWriter.AddInt(m_nFontSize);
+                oWriter.WriteString(L"\"/><w:szCs w:val=\"");
+                oWriter.AddInt(m_nFontSize);
+                oWriter.WriteString(L"\"/>");
+
+                oWriter.WriteString(L"<w:color w:val=\"");
+                oWriter.WriteHexInt3(ConvertColor(m_nColor));
+                oWriter.WriteString(L"\"/>");
+
+                if (pSpace)
+                {
+                    oWriter.WriteString(L"<w:spacing w:val=\"");
+                    oWriter.AddInt(*pSpace);
+                    oWriter.WriteString(L"\"/>");
+                }
+
+                oWriter.WriteString(L"</w:rPr>");
+            }
+            else
+            {
+                bool bIsStart = false;
+
+                if (m_sFontName != pDefault->m_sFontName)
+                {
+                    if (!bIsStart) { bIsStart = true; oWriter.WriteString(L"<w:rPr>"); }
+                    oWriter.WriteString(L"<w:rFonts w:ascii=\"");
+                    oWriter.WriteEncodeXmlString(m_sFontName);
+                    oWriter.WriteString(L"\" w:hAnsi=\"");
+                    oWriter.WriteEncodeXmlString(m_sFontName);
+                    oWriter.WriteString(L"\" w:cs=\"");
+                    oWriter.WriteEncodeXmlString(m_sFontName);
+                    oWriter.WriteString(L"\"/>");
+                }
+
+                if (m_bBold != pDefault->m_bBold)
+                {
+                    if (!bIsStart) { bIsStart = true; oWriter.WriteString(L"<w:rPr>"); }
+                    oWriter.WriteString(m_bBold ? L"<w:b w:val=\"true\"/>" : L"<w:b w:val=\"false\"/>");
+                }
+
+                if (m_bItalic != pDefault->m_bItalic)
+                {
+                    if (!bIsStart) { bIsStart = true; oWriter.WriteString(L"<w:rPr>"); }
+                    oWriter.WriteString(m_bItalic ? L"<w:i w:val=\"true\"/>" : L"<w:i w:val=\"false\"/>");
+                }
+
+                if (m_nFontSize != pDefault->m_nFontSize)
+                {
+                    if (!bIsStart) { bIsStart = true; oWriter.WriteString(L"<w:rPr>"); }
+                    oWriter.WriteString(L"<w:sz w:val=\"");
+                    oWriter.AddInt(m_nFontSize);
+                    oWriter.WriteString(L"\"/><w:szCs w:val=\"");
+                    oWriter.AddInt(m_nFontSize);
+                    oWriter.WriteString(L"\"/>");
+                }
+
+                if (m_nColor != pDefault->m_nColor)
+                {
+                    if (!bIsStart) { bIsStart = true; oWriter.WriteString(L"<w:rPr>"); }
+                    oWriter.WriteString(L"<w:color w:val=\"");
+                    oWriter.WriteHexInt3(ConvertColor(m_nColor));
+                    oWriter.WriteString(L"\"/>");
+                }
+
+                if (pSpace)
+                {
+                    if (!bIsStart) { bIsStart = true; oWriter.WriteString(L"<w:rPr>"); }
+                    oWriter.WriteString(L"<w:spacing w:val=\"");
+                    oWriter.AddInt(*pSpace);
+                    oWriter.WriteString(L"\"/>");
+                }
+
+                if (bIsStart)
+                    oWriter.WriteString(L"</w:rPr>");
+            }
+        }
+    };
+
     class CContText
     {
     public:
@@ -198,36 +333,51 @@ namespace NSDocxRenderer
             return (m_dX >= oSrc->m_dX) ? true : false;
         }
 
-        inline void Write(NSStringUtils::CStringBuilder& oWriter, CFontManagerLight* pManagerLight, bool bIsAddSpace = false)
+        CContTextStyle GetCompiledStyle()
         {
-            oWriter.WriteString(L"<w:r><w:rPr>");
-
-            if (m_dWidth != m_dWidthWithoutSpaces)
-            {
-                DeleteSpaces(m_oText);
-                m_dWidth = m_dWidthWithoutSpaces;
-            }
+            CContTextStyle style;
 
             if (m_strPickFontName.empty())
             {
                 if (m_oFont.Bold)
-                    oWriter.WriteString(L"<w:b w:val=\"true\"/>");
+                    style.m_bBold = true;
                 if (m_oFont.Italic)
-                    oWriter.WriteString(L"<w:i w:val=\"true\"/>");
-
-                if (bIsAddSpace)
-                {
-                    m_dWidth  += m_dSpaceWidthMM;
-                    m_oText += L" ";
-                }
+                    style.m_bItalic = true;
             }
             else
             {
                 if (0x01 == (0x01 & m_lPickFontStyle))
-                    oWriter.WriteString(L"<w:b w:val=\"true\"/>");
+                    style.m_bBold = true;
                 if (0x02 == (0x02 & m_lPickFontStyle))
-                    oWriter.WriteString(L"<w:i w:val=\"true\"/>");
+                    style.m_bItalic = true;
+            }
 
+            style.m_sFontName = m_strPickFontName.empty() ? m_oFont.Name : m_strPickFontName;
+            style.m_nFontSize = (int)(2 * m_oFont.Size);
+
+            style.m_nColor = m_oBrush.Color1;
+
+            return style;
+        }
+
+        inline void Write(NSStringUtils::CStringBuilder& oWriter, CFontManagerLight* pManagerLight, bool bIsAddSpace, CContTextStyle* pDefaultStyle)
+        {
+            CContTextStyle curStyle = GetCompiledStyle();
+
+            oWriter.WriteString(L"<w:r>");
+
+            if (m_strPickFontName.empty())
+            {
+                if (bIsAddSpace)
+                {
+                    m_dWidth += m_dSpaceWidthMM;
+                    m_oText += L" ";
+                }
+
+                curStyle.Write(oWriter, pDefaultStyle);
+            }
+            else
+            {
                 if (bIsAddSpace)
                 {
                     m_dWidth  += pManagerLight->GetSpaceWidth();
@@ -242,35 +392,14 @@ namespace NSDocxRenderer
                 if (fabs(dWidth - m_dWidth) > 2)
                 {
                     double dSpacing = (m_dWidth - dWidth) / (m_oText.length() + 1);
-                    dSpacing *= c_dMMToDx;
-
-                    oWriter.WriteString(L"<w:spacing w:val=\"");
-                    oWriter.AddInt((int)dSpacing);
-                    oWriter.WriteString(L"\"/>");
+                    int nSpacing = (int)(dSpacing * c_dMMToDx);
+                    curStyle.Write(oWriter, pDefaultStyle, &nSpacing);
+                }
+                else
+                {
+                    curStyle.Write(oWriter, pDefaultStyle);
                 }
             }
-
-            int lSize = (int)(2 * m_oFont.Size);
-            oWriter.WriteString(L"<w:sz w:val=\"");
-            oWriter.AddInt(lSize);
-            oWriter.WriteString(L"\"/><w:szCs w:val=\"");
-            oWriter.AddInt(lSize);
-            oWriter.WriteString(L"\"/>");
-
-            std::wstring& strFontName = m_strPickFontName.empty() ? m_oFont.Name : m_strPickFontName;
-            oWriter.WriteString(L"<w:rFonts w:ascii=\"");
-            oWriter.WriteEncodeXmlString(strFontName);
-            oWriter.WriteString(L"\" w:hAnsi=\"");
-            oWriter.WriteEncodeXmlString(strFontName);
-            oWriter.WriteString(L"\" w:cs=\"");
-            oWriter.WriteEncodeXmlString(strFontName);
-            oWriter.WriteString(L"\"/>");
-
-            oWriter.WriteString(L"<w:color w:val=\"");
-            oWriter.WriteHexInt3(ConvertColor(m_oBrush.Color1));
-            oWriter.WriteString(L"\"/>");
-
-            oWriter.WriteString(L"</w:rPr>");
 
             oWriter.WriteString(L"<w:t xml:space=\"preserve\">");
             oWriter.WriteEncodeXmlString(m_oText.ToStdWString());
@@ -279,54 +408,20 @@ namespace NSDocxRenderer
             oWriter.WriteString(L"</w:r>");
         }
 
-        void WriteTo(double dSpacingMM, NSStringUtils::CStringBuilder& oWriter, CFontManagerLight* pManagerLight)
+        void WriteTo(double dSpacingMM, NSStringUtils::CStringBuilder& oWriter, CFontManagerLight* pManagerLight, CContTextStyle* pDefaultStyle)
         {
-            oWriter.WriteString(L"<w:r><w:rPr>");
+            CContTextStyle curStyle = GetCompiledStyle();
+
+            oWriter.WriteString(L"<w:r>");
 
             double dSpaceMMSize = m_dSpaceWidthMM;
-            if (m_strPickFontName.empty())
+            if (!m_strPickFontName.empty())
             {
-                if (m_oFont.Bold)
-                    oWriter.WriteString(L"<w:b w:val=\"true\"/>");
-                if (m_oFont.Italic)
-                    oWriter.WriteString(L"<w:i w:val=\"true\"/>");
-            }
-            else
-            {
-                if (0x01 == (0x01 & m_lPickFontStyle))
-                    oWriter.WriteString(L"<w:b w:val=\"true\"/>");
-                if (0x02 == (0x02 & m_lPickFontStyle))
-                    oWriter.WriteString(L"<w:i w:val=\"true\"/>");
-
                 dSpaceMMSize = pManagerLight->GetSpaceWidth();
             }
+            int nSpacing = (LONG)((dSpacingMM - dSpaceMMSize) * c_dMMToDx);
 
-            int lSize = (int)(2 * m_oFont.Size);
-            oWriter.WriteString(L"<w:sz w:val=\"");
-            oWriter.AddInt(lSize);
-            oWriter.WriteString(L"\"/><w:szCs w:val=\"");
-            oWriter.AddInt(lSize);
-            oWriter.WriteString(L"\"/>");
-
-            std::wstring& strFontName = m_strPickFontName.empty() ? m_oFont.Name : m_strPickFontName;
-            oWriter.WriteString(L"<w:rFonts w:ascii=\"");
-            oWriter.WriteEncodeXmlString(strFontName);
-            oWriter.WriteString(L"\" w:hAnsi=\"");
-            oWriter.WriteEncodeXmlString(strFontName);
-            oWriter.WriteString(L"\" w:cs=\"");
-            oWriter.WriteEncodeXmlString(strFontName);
-            oWriter.WriteString(L"\"/>");
-
-            oWriter.WriteString(L"<w:color w:val=\"");
-            oWriter.WriteHexInt3(ConvertColor(m_oBrush.Color1));
-            oWriter.WriteString(L"\"/>");
-
-            LONG lSpacing = (LONG)((dSpacingMM - dSpaceMMSize) * c_dMMToDx);
-            oWriter.WriteString(L"<w:spacing w:val=\"");
-            oWriter.AddInt((int)lSpacing);
-            oWriter.WriteString(L"\"/>");
-
-            oWriter.WriteString(L"</w:rPr>");
+            curStyle.Write(oWriter, pDefaultStyle, &nSpacing);
 
             oWriter.WriteString(L"<w:t xml:space=\"preserve\">");
             oWriter.WriteString(L" ");
@@ -450,7 +545,7 @@ namespace NSDocxRenderer
             }
         }
 
-        void ToXml(NSStringUtils::CStringBuilder& oWriter, CFontManagerLight* pManagerLight)
+        void ToXml(NSStringUtils::CStringBuilder& oWriter, CFontManagerLight* pManagerLight, CContTextStyle* pDefaultStyle = NULL)
         {
             size_t nCountConts = m_arConts.size();
 
@@ -472,25 +567,25 @@ namespace NSDocxRenderer
                 if (dDelta < 0.5)
                 {
                     // просто текст на тексте или сменились настройки (font/brush)
-                    pPrev->Write(oWriter, pManagerLight);
+                    pPrev->Write(oWriter, pManagerLight, false, pDefaultStyle);
                     pPrev  = pCurrent;
                 }
                 //else if (dDelta < 2 * pPrev->m_dSpaceWidthMM)
                 //{
                 //	// сменились настройки, но пробел все-таки вставить нужно
-                //	pPrev->Write(oWriter, pManagerLight, true);
+                //	pPrev->Write(oWriter, pManagerLight, true, pDefaultStyle);
                 //	pPrev = pCurrent;
                 //}
                 else
                 {
                     // расстояние слишком большое. нужно сделать большой пробел
-                    pPrev->Write(oWriter, pManagerLight);
-                    pPrev->WriteTo(dDelta, oWriter, pManagerLight);
+                    pPrev->Write(oWriter, pManagerLight, false, pDefaultStyle);
+                    pPrev->WriteTo(dDelta, oWriter, pManagerLight, pDefaultStyle);
                     pPrev = pCurrent;
                 }
             }
 
-            pPrev->Write(oWriter, pManagerLight);
+            pPrev->Write(oWriter, pManagerLight, false, pDefaultStyle);
         }
     };
 
@@ -583,6 +678,9 @@ namespace NSDocxRenderer
         {
             oWriter.WriteString(L"<w:p>");
 
+            CContTextStyle* pDefaultStyle = NULL;
+            size_t nCount = m_arLines.size();
+
             switch (m_eTextAssociationType)
             {
             case TextAssociationTypeBlockChar:
@@ -591,7 +689,7 @@ namespace NSDocxRenderer
                     oWriter.AddInt((int)(m_dLeft * c_dMMToDx));
                     oWriter.WriteString(L"\" w:y=\"");
                     oWriter.AddInt((int)(m_dTop * c_dMMToDx));
-                    oWriter.WriteString(L"\"/></w:pPr>");
+                    oWriter.WriteString(L"\"/>");
                     break;
                 }
             case TextAssociationTypeBlockLine:
@@ -600,33 +698,51 @@ namespace NSDocxRenderer
                     oWriter.AddInt((int)(m_dLeft * c_dMMToDx));
                     oWriter.WriteString(L"\" w:y=\"");
                     oWriter.AddInt((int)(m_dTop * c_dMMToDx));
-                    oWriter.WriteString(L"\"/></w:pPr>");
+                    oWriter.WriteString(L"\"/>");
                     break;
                 }
             case TextAssociationTypePlainLine:
                 {
+#if 0
+                    if (nCount > 0)
+                    {
+                        CTextLine* pTextLine = m_arLines[0];
+                        if (0 < pTextLine->m_arConts.size())
+                        {
+                            pDefaultStyle = new CContTextStyle(pTextLine->m_arConts[0]->GetCompiledStyle());
+                        }
+                    }
+#endif
+
                     oWriter.WriteString(L"<w:pPr><w:spacing w:before=\"");
                     oWriter.AddInt((int)(m_dSpaceBefore * c_dMMToDx));
                     oWriter.WriteString(L"\" w:line=\"");
                     oWriter.AddInt((int)(m_dHeight * c_dMMToDx));
                     oWriter.WriteString(L"\" w:lineRule=\"exact\"/><w:ind w:left=\"");
                     oWriter.AddInt((int)(m_dLeft * c_dMMToDx));
-                    oWriter.WriteString(L"\"/></w:pPr>");
+                    oWriter.WriteString(L"\"/>");
                     break;
                 }
             default:
                 break;
             }
 
-            size_t nCount = m_arLines.size();
+            if (pDefaultStyle)
+                pDefaultStyle->Write(oWriter, NULL);
+
+            oWriter.WriteString(L"</w:pPr>");
+
             for (size_t i = 0; i < nCount; ++i)
             {
                 CTextLine* pTextLine = m_arLines[i];
                 pTextLine->SortConts();
-                pTextLine->ToXml(oWriter, m_pManagerLight);
+                pTextLine->ToXml(oWriter, m_pManagerLight, pDefaultStyle);
             }
 
             oWriter.WriteString(L"</w:p>");
+
+            if (pDefaultStyle)
+                delete pDefaultStyle;
         }
     };
 }
