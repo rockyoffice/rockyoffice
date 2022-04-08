@@ -767,6 +767,7 @@ namespace PdfReader
             if (wsFontBaseName.empty())
                 wsFontBaseName = L"Helvetica";
             const unsigned char* pData14 = NULL;
+            GfxFontLoc* fontLoc = NULL;
             unsigned int nSize14 = 0;
         #ifdef FONTS_USE_ONLY_MEMORY_STREAMS
             CMemoryFontStream oMemoryFontStream;
@@ -1085,46 +1086,12 @@ namespace PdfReader
                 }
             }
         #ifndef BUILDING_WASM_MODULE
-            else if (PdfReader::GetBaseFont(wsFontBaseName, pData14, nSize14))
-            {
-                FILE* pFile = NULL;
-                if (!NSFile::CFileBinary::OpenTempFile(&wsTempFileName, &pFile, L"wb", L".base",
-                                                      (wchar_t*)((GlobalParamsAdaptor*)globalParams)->GetTempFolder().c_str(), NULL))
-                {
-                    if (!wsTempFileName.empty())
-                        NSFile::CFileBinary::Remove(wsTempFileName);
-
-                    pEntry->bAvailable = true;
-                    return;
-                }
-                fclose(pFile);
-                NSFile::CFileBinary oFile;
-                oFile.CreateFileW(wsTempFileName);
-                oFile.WriteFile((BYTE*)pData14, nSize14);
-                oFile.CloseFile();
-                wsFileName = wsTempFileName;
-
-                eFontType = fontTrueType;
-            }
+            else if (!(fontLoc = pFont->locateFont(m_pXref, false)) ||
+                (wsFileName = NSStrings::GetString(fontLoc->path)).empty())
         #else
-            else if ([&oMemoryFontStream, wsFontBaseName]()
-            {
-                const unsigned char* pData14 = NULL;
-                unsigned int nSize14 = 0;
-                if (PdfReader::GetBaseFont(wsFontBaseName, pData14, nSize14))
-                {
-                     oMemoryFontStream.fromBuffer((BYTE*)pData14, nSize14);
-                     return true;
-                }
-                return false;
-            }())
-            {
-                wsFileName = wsFontBaseName;
-                NSFonts::NSApplicationFontStream::GetGlobalMemoryStorage()->Add(wsFileName, oMemoryFontStream.m_pData, (LONG)oMemoryFontStream.m_nSize, true);
-            }
+            else if (!(fontLoc = pFont->locateFont(m_pXref, true)) ||
+                (wsFileName = NSStrings::GetString(fontLoc->path)).empty())
         #endif
-            else if (!pFont->locateFont(m_pXref, false) ||
-                (wsFileName = NSStrings::GetString(pFont->locateFont(m_pXref, false)->path)).length() == 0)
             //else if (0)
             {
                 // TODO: Сначала тут мы должны проверить, если ищется один из 14 стандартных шрифтов,
@@ -1429,6 +1396,54 @@ namespace PdfReader
                     }
                 }
             }
+            RELEASEOBJECT(fontLoc);
+
+        #ifndef BUILDING_WASM_MODULE
+            fontLoc = pFont->locateFont(m_pXref, true);
+            if (fontLoc)
+                wsFontBaseName = NSStrings::GetString(fontLoc->path);
+            RELEASEOBJECT(fontLoc);
+
+            if (PdfReader::GetBaseFont(wsFontBaseName, pData14, nSize14))
+            {
+                FILE* pFile = NULL;
+                if (!NSFile::CFileBinary::OpenTempFile(&wsTempFileName, &pFile, L"wb", L".base",
+                                                      (wchar_t*)((GlobalParamsAdaptor*)globalParams)->GetTempFolder().c_str(), NULL))
+                {
+                    if (!wsTempFileName.empty())
+                        NSFile::CFileBinary::Remove(wsTempFileName);
+
+                    pEntry->bAvailable = true;
+                    return;
+                }
+                fclose(pFile);
+                NSFile::CFileBinary oFile;
+                oFile.CreateFileW(wsTempFileName);
+                oFile.WriteFile((BYTE*)pData14, nSize14);
+                oFile.CloseFile();
+                wsFileName = wsTempFileName;
+
+                eFontType = fontTrueType;
+            }
+        #else
+            if ([&oMemoryFontStream, wsFontBaseName, wsFileName]()
+            {
+                const unsigned char* pData14 = NULL;
+                unsigned int nSize14 = 0;
+                if (PdfReader::GetBaseFont(wsFontBaseName, pData14, nSize14) ||
+                    PdfReader::GetBaseFont(wsFileName, pData14, nSize14))
+                {
+                     oMemoryFontStream.fromBuffer((BYTE*)pData14, nSize14);
+                     return true;
+                }
+                return false;
+            }())
+            {
+                wsFileName = wsFontBaseName;
+                NSFonts::NSApplicationFontStream::GetGlobalMemoryStorage()->Add(wsFileName, oMemoryFontStream.m_pData, (LONG)oMemoryFontStream.m_nSize, true);
+            }
+        #endif
+
             // Здесь мы грузим кодировки
             int *pCodeToGID = NULL, *pCodeToUnicode = NULL;
             int nLen = 0;
