@@ -45,8 +45,8 @@ void TxBodyConverter::ConvertTableTxBody(PPTX::Logic::TxBody &oTxBody)
     {
         oTxBody.lstStyle = new PPTX::Logic::TextListStyle;
         PPTX::Logic::Paragraph paragraph;
-        unsigned sz = m_pShapeElement->m_rcChildAnchor.GetHeight() * 10;
-        paragraph.endParaRPr = getNewEndParaRPr(false, sz > 2000 ? 2000 : sz);
+        unsigned sz = GetEndParaRPrSz() * 100;
+        paragraph.endParaRPr = getNewEndParaRPr(false, /*sz > 2000 ? 2000 : */sz);
         oTxBody.Paragrs.push_back(paragraph);
 
         return;
@@ -74,6 +74,45 @@ void TxBodyConverter::ConvertTableTxBody(PPTX::Logic::TxBody &oTxBody)
     //        FillLstStyles(oTxBody.lstStyle.get2(), m_pText->m_oStyles);
     //        FillParagraphs(oTxBody.Paragrs, m_pText->m_arParagraphs);
     //    }
+}
+
+int TxBodyConverter::GetEndParaRPrSz() const
+{
+    const int err = 0;
+
+    // for the first we check current shape
+    int size = GetLastTextSize(m_pShapeElement);
+    if (size > 0) return size; else size = err;
+
+    if (m_pShapeElement->m_pParentElements == nullptr)
+        return err;
+
+    // If it have not worked, we are trying to find size from parents
+    for (const auto& ptrParent : *m_pShapeElement->m_pParentElements)
+    {
+        int tempSize = GetLastTextSize(ptrParent.get());
+        if (tempSize > 0) size = tempSize;
+    }
+
+    return size;
+}
+
+int TxBodyConverter::GetLastTextSize(const CElement* pElement)
+{
+    if (pElement == nullptr)
+        return -1;
+
+    const auto pShpElement = dynamic_cast<const CShapeElement*>(pElement);
+    if (pShpElement == nullptr || pShpElement->m_pShape == nullptr)
+        return -1;
+
+    int size(-1);
+    for (const auto& p : pShpElement->m_pShape->m_oText.m_arParagraphs)
+        for (const auto& span : p.m_arSpans)
+            if(span.m_oRun.Size.IsInit())
+                size = span.m_oRun.Size.get();
+
+    return size;
 }
 
 void TxBodyConverter::ConvertShapeTxBody(PPTX::Logic::TxBody &oTxBody)
@@ -522,8 +561,8 @@ void TxBodyConverter::FillRPr(PPTX::Logic::RunProperties &oRPr, CTextCFRun &oCFR
             ConvertLine(oRPr.ln.get2());
         }
         // I don't know todo or not
-//        m_oWriter.WriteString(ConvertBrush(pShapeElement->m_oBrush));
-//        m_oWriter.WriteString(ConvertShadow(pShapeElement->m_oShadow));
+        //        m_oWriter.WriteString(ConvertBrush(pShapeElement->m_oBrush));
+        //        m_oWriter.WriteString(ConvertShadow(pShapeElement->m_oShadow));
     }
     else
     {
@@ -580,10 +619,10 @@ void TxBodyConverter::ConvertLine(PPTX::Logic::Ln &oLn)
     oLn.cmpd = new PPTX::Limit::CompoundLine;
     switch(oPen.LineStyle)
     {
-        case 1: oLn.cmpd->set(L"dbl");		break;
-        case 2: oLn.cmpd->set(L"thickThin"); break;
-        case 3: oLn.cmpd->set(L"thinThick");	break;
-        case 4: oLn.cmpd->set(L"tri");		break;
+    case 1: oLn.cmpd->set(L"dbl");		break;
+    case 2: oLn.cmpd->set(L"thickThin"); break;
+    case 3: oLn.cmpd->set(L"thinThick");	break;
+    case 4: oLn.cmpd->set(L"tri");		break;
     }
 
 
@@ -637,27 +676,27 @@ void TxBodyConverter::ConvertLineEnd(PPTX::Logic::LineEnd &oLine, unsigned char 
     oLine.type = new PPTX::Limit::LineEndType;
     switch(cap)
     {
-        case 1: oLine.type->set(L"triangle");	break;
-        case 2: oLine.type->set(L"stealth");	break;
-        case 3: oLine.type->set(L"diamond");	break;
-        case 4: oLine.type->set(L"oval");		break;
-        case 5: oLine.type->set(L"arrow");		break;
+    case 1: oLine.type->set(L"triangle");	break;
+    case 2: oLine.type->set(L"stealth");	break;
+    case 3: oLine.type->set(L"diamond");	break;
+    case 4: oLine.type->set(L"oval");		break;
+    case 5: oLine.type->set(L"arrow");		break;
     }
 
     oLine.len = new PPTX::Limit::LineEndSize;
     switch(length)
     {
-        case 0: oLine.len->set(L"sm");	break;
-        case 1: oLine.len->set(L"med");	break;
-        case 2: oLine.len->set(L"lg");	break;
+    case 0: oLine.len->set(L"sm");	break;
+    case 1: oLine.len->set(L"med");	break;
+    case 2: oLine.len->set(L"lg");	break;
     }
 
     oLine.w = new PPTX::Limit::LineEndSize;
     switch(width)
     {
-        case 0: oLine.w->set(L"sm");	break;
-        case 1: oLine.w->set(L"med");	break;
-        case 2: oLine.w->set(L"lg");	break;
+    case 0: oLine.w->set(L"sm");	break;
+    case 1: oLine.w->set(L"med");	break;
+    case 2: oLine.w->set(L"lg");	break;
     }
 }
 

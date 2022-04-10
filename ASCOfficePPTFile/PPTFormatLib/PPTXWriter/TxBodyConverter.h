@@ -50,6 +50,8 @@ public:
     void FillTxBody(PPTX::Logic::TxBody& oTxBody);
 private:
     void ConvertTableTxBody(PPTX::Logic::TxBody& oTxBody);
+    int  GetEndParaRPrSz()const;
+    static int GetLastTextSize(const CElement *pElement);
     void ConvertShapeTxBody(PPTX::Logic::TxBody& oTxBody);
     void FillMergedTxBody(PPTX::Logic::TxBody& oTxBody);
 

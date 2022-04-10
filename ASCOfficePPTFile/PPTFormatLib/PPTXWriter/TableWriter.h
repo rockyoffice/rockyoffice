@@ -161,7 +161,6 @@ private:
                        std::vector<CShapeElement*>& arrSpliters);
 
     void FillRow(PPTX::Logic::TableRow& oRow, ProtoTableRow &arrCells);
-
 public:
     std::wstring getXmlForGraphicFrame(int ID, int idx)const;
 private:
