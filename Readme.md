@@ -4,7 +4,7 @@
 ## 声明
 rocky office 是基于优秀的开源方案onlyoffice实现的解决方案
 
-Official website: [http://www.onlyoffice.com](http://onlyoffice.com "http://www.onlyoffice.com")
+他们的website: [http://www.onlyoffice.com](http://onlyoffice.com "http://www.onlyoffice.com")
 
 根据开源协议我们将修改过的代码进行开源
 
